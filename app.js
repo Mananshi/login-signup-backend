@@ -1,18 +1,45 @@
-import express  from 'express'
-import bodyParser from 'body-parser'
-import cors from 'cors'
+const express = require( 'express')
+const bodyParser = require( 'body-parser')
+const cors = require( 'cors')
+const mongoose = require( 'mongoose')
+const User = require( './models/User')
 
-const app = express();
-const port = process.env.PORT || 3000;
+const app = express()
+// const port = process.env.PORT || 3000
+const port = 80
 
-app.use(cors());
 
-// Configuring body parser middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+const corsOptions = {
+    origin: 'https://636536229e7c820062d21e9e--heartfelt-salmiakki-6260ce.netlify.app/',
+    credentials: true,
+}
+app.use(cors(corsOptions))
 
-app.get('/details', (req, res) => {
-    res.send({data: 'Hello World, from express'});
+mongoose.connect('mongodb+srv://superadmin:9UG2hm6YuUbzSqL@cluster0.f4vccnn.mongodb.net/?retryWrites=true&w=majority',
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }
+)
+
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "connection error: "));
+db.once("open", function () {
+    console.log("Connected successfully");
 });
 
-app.listen(port, () => console.log(`Hello world app listening on http://localhost:${port}`))
+// Configuring body parser middleware
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+
+app.get('/details', async (req, res) => {
+    try{
+        const user = await user.find({});
+        res.send(user);
+    }
+    catch(err){
+        console.log(err);
+    }
+})
+
+app.listen(port, () => console.log(`Hello world app listening on port ${port}`))
