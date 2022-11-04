@@ -15,12 +15,15 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
+// the mongodb url is supposed to be saved in an env file. This is only for demo purposes
+
 mongoose.connect('mongodb+srv://superadmin:9UG2hm6YuUbzSqL@cluster0.f4vccnn.mongodb.net/?retryWrites=true&w=majority',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
     }
 )
+
 
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error: "));
