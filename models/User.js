@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../db');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const User = db.define('users', 
     {
@@ -37,12 +38,13 @@ const run = async() => {
 
 User.loginUser = async (req, res) => {
     try{
-        const {email, password} = req.body;
+        const body = req.body;
 
-        if(email){
-            const user = await User.findOne({where: {email: email}});
+        if(body.email){
+            const user = await User.findOne({where: {email: body.email}});
             if(user){
-                if(password === user.password){
+                const correctPassword = await bcrypt.compare(body.password, user.password)
+                if(correctPassword){
                     const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'})
                     res.status(200).json({token})
                 }
@@ -64,17 +66,23 @@ User.loginUser = async (req, res) => {
 
 User.signupUser = async (req, res) => {
     try{
-        const {name, email, password} = req.body
+        const body = req.body
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(body.password, salt)
+        console.log(hashedPassword)
         const validEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
         const validPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
-        if(validEmail.test(email)){
-            const user = await User.findOne({where: {email: email}});
+        if(validEmail.test(body.email)){
+            const user = await User.findOne({where: {email: body.email}});
             if(user){
                 res.status(401).json({message: 'Account already exists'})
             }
             else {
-                if(validPassword.test(password)){
-                    await User.create({name, email, password})
+                if(validPassword.test(body.password)){
+                    await User.create({
+                        name: body.name, 
+                        email: body.email, 
+                        password: hashedPassword})
                     res.status(200).json({message: 'Account created'})
                 }
                 else {
