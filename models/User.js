@@ -37,11 +37,10 @@ const run = async() => {
 
 User.loginUser = async (req, res) => {
     try{
-        const {email, password} = req.body
-        const validEmail = /^[a-zA-Z0-9.! #$%&'*+/=? ^_`{|}~-]+@[a-zA-Z0-9-]+(?:\. [a-zA-Z0-9-]+)*$/
-        if(validEmail.test(email)){
-            const user = await User.findOne({where: {email: email}})
-            console.log(user)
+        const {email, password} = req.body;
+
+        if(email){
+            const user = await User.findOne({where: {email: email}});
             if(user){
                 if(password === user.password){
                     const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'})
@@ -61,19 +60,27 @@ User.loginUser = async (req, res) => {
         console.log(err)
         res.status(500).json({messege: "Internal Server Error"})
     }
-}
+};
 
 User.signupUser = async (req, res) => {
     try{
         const {name, email, password} = req.body
-        const user = await User.create({name, email, password})
-
-        return res.status(201).json({message: 'User created successfully'})
+        if(email){
+            const user = await User.findOne({where: {email: email}});
+            if(user){
+                res.status(401).json({message: 'Account already exists'})
+            }
+            else {
+                const newUser = await User.create({name, email, password})
+                res.status(200).json({message: 'Account created'})
+            }
+        }
     }
     catch(err){
-        console.log(err)
-        res.status(500).json({messege: "Internal Server Error"})
+        console.log(err);
+        res.status(500).json({messege: "Internal Server Error"});
     }
 
-}
-module.exports = User
+};
+
+module.exports = User;
