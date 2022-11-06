@@ -58,9 +58,9 @@ User.loginUser = async (req, res) => {
         }
     } catch(err){
         console.log(err)
-        res.status(500).json({messege: "Internal Server Error"})
+        res.status(500).json({message: "Internal Server Error"})
     }
-};
+}
 
 User.signupUser = async (req, res) => {
     try{
@@ -71,16 +71,16 @@ User.signupUser = async (req, res) => {
                 res.status(401).json({message: 'Account already exists'})
             }
             else {
-                const newUser = await User.create({name, email, password})
+                await User.create({name, email, password})
                 res.status(200).json({message: 'Account created'})
             }
         }
     }
     catch(err){
-        console.log(err);
-        res.status(500).json({messege: "Internal Server Error"});
+        console.log(err)
+        res.status(500).json({message: "Internal Server Error"})
     }
 
-};
+}
 
-module.exports = User;
+module.exports = User
