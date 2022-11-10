@@ -108,8 +108,9 @@ User.signupUser = async (req, res) => {
 }
 
 User.logoutUser = async (req, res) => {
+    const body = req.body
     try{
-        await User.update({isLoggedIn: false}, {where: {email: req.body.email}})
+        await User.update({isLoggedIn: body.isLoggedIn || false}, {where: {email: req.body.email}})
         
         res.status(200).json({message: 'Logged out'})
     }
