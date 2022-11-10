@@ -23,6 +23,11 @@ const User = db.define('users',
             type: Sequelize.STRING,
             allowNull: false
         },
+        // isLoggedIn: {
+        //     type: Sequelize.BOOLEAN,
+        //     allowNull: false,
+        //     defaultValue: false
+        // }
     },
     {timestamps: false}
 );
@@ -46,6 +51,7 @@ User.loginUser = async (req, res) => {
                 const correctPassword = await bcrypt.compare(body.password, user.password)
                 if(correctPassword){
                     const token = jwt.sign({id: user.id}, process.env.JWT_SECRET, {expiresIn: '1h'})
+                    await User.update({isLoggedIn: true}, {where: {email: body.email}})
                     res.status(200).json({token})
                 }
                 else{
@@ -99,6 +105,18 @@ User.signupUser = async (req, res) => {
         res.status(500).json({message: "Internal Server Error"})
     }
 
+}
+
+User.logoutUser = async (req, res) => {
+    try{
+        await User.update({isLoggedIn: false}, {where: {email: req.body.email}})
+        
+        res.status(200).json({message: 'Logged out'})
+    }
+    catch(err){
+        console.log(err)
+        res.status(500).json({message: "Internal Server Error"})
+    }
 }
 
 module.exports = User
