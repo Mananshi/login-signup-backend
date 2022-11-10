@@ -23,11 +23,11 @@ const User = db.define('users',
             type: Sequelize.STRING,
             allowNull: false
         },
-        // isLoggedIn: {
-        //     type: Sequelize.BOOLEAN,
-        //     allowNull: false,
-        //     defaultValue: false
-        // }
+        isLoggedIn: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false
+        }
     },
     {timestamps: false}
 );
